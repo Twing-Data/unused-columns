@@ -1,0 +1,99 @@
+query_text,database_name,schema_name
+"SELECT region_id, AVG(clicks) AS avg_clicks FROM public.agg_hourly GROUP BY region_id;",catalog,public
+"SELECT srt.ymd, r.name AS region_name, br.name AS brand_name, SUM(srt.views) AS total_views FROM public.agg_daily srt JOIN public.region r ON srt.region_id = r.id JOIN public.brand br ON srt.brand_id = br.id GROUP BY srt.ymd, r.name, br.name;",catalog,public
+"SELECT ymd, sum(spend) FROM (SELECT * FROM public.agg_hourly WHERE ymd >= current_date - interval '7 days' AND hour = 9) a group by 1;",catalog,public
+"SELECT br.name AS brand_name, SUM(b.views) AS total_views, SUM(b.conversions) AS total_conversions FROM public.agg_daily b JOIN public.brand br ON b.brand_id = br.id GROUP BY br.name;",catalog,public
+"SELECT b.name AS brand_name, COUNT(DISTINCT srt.ymd) AS active_days FROM public.agg_hourly srt JOIN public.brand b ON srt.brand_id = b.id GROUP BY b.name",catalog,public
+"SELECT region_id, SUM(views) AS total_views, SUM(conversions) AS total_conversions FROM public.agg_hourly GROUP BY region_id;",catalog,public
+"SELECT r.name, SUM(b.views) AS total_views FROM public.agg_daily b JOIN public.region r ON b.region_id = r.id GROUP BY r.name;",catalog,public
+"SELECT os.name, COUNT(b.conversions) AS conversion_count FROM public.agg_daily b JOIN public.operating_system os ON b.os_id = os.id WHERE b.conversions > 0 GROUP BY os.name;",catalog,public
+"SELECT ymd, brand_id, MAX(impressions) AS max_impressions FROM public.agg_daily GROUP BY ymd, brand_id;",catalog,public
+"SELECT srt.ymd, b.name AS brand_name, r.name AS region_name, AVG(srt.conversions) AS avg_conversions FROM public.agg_hourly srt JOIN public.brand b ON srt.brand_id = b.id JOIN public.region r ON srt.region_id = r.id GROUP BY srt.ymd, b.name, r.name;",catalog,public
+"SELECT b.name, SUM(srt.conversions) AS total_conversions
+  FROM public.agg_monthly srt
+  JOIN public.brand b ON srt.brand_id = b.id
+  WHERE srt.conversions > (SELECT 2.0*MIN(conversions) FROM public.agg_monthly)
+  GROUP BY b.name;",catalog,public
+"SELECT ymd, SUM(spend), SUM(views) FROM public.agg_monthly GROUP BY ymd HAVING SUM(spend) > 1000;",catalog,public
+"SELECT date(a.datetime), c.brand_id, SUM(a.price) AS daily_spend FROM ad_win a JOIN creative c ON a.creative_id = c.id GROUP BY date(a.datetime), c.brand_id;",catalog,public
+"SELECT creative_id, AVG(cost) AS avg_cost, AVG(price) AS avg_price FROM ad_win GROUP BY creative_id;",catalog,public
+"SELECT city.id, city.name, sum(ad_combined.view) AS total_views FROM ad_combined JOIN city on ad_combined.city_id = city.id GROUP BY city.id, city.name ORDER BY total_views DESC LIMIT 5;",catalog,public
+"SELECT ymd, SUM(impressions) AS total_impressions, SUM(clicks) AS total_clicks FROM public.agg_daily GROUP BY ymd;",catalog,public
+SELECT * FROM public.agg_hourly WHERE ymd = '2024-03-03' AND hour = 9;,catalog,public
+"SELECT os.name AS operating_system, COUNT(con.ad_request_id) * 1.0 / COUNT(DISTINCT ar.ad_request_id) AS conversion_rate FROM ad_request ar JOIN ad_conversion con ON ar.ad_request_id = con.ad_request_id JOIN operating_system os ON ar.os_id = os.id GROUP BY os.name;",catalog,public
+"SELECT c.name AS city_name, brw.name AS browser_name, SUM(b.views) AS total_views FROM public.agg_hourly b JOIN public.city c ON b.city_id = c.id JOIN public.browser brw ON b.browser_id = brw.id GROUP BY c.name, brw.name;",catalog,public
+"SELECT b.ymd, br.name as brand_name, br.name as category, AVG(b.clicks) AS avg_clicks FROM public.agg_daily b JOIN public.brand br ON b.brand_id = br.id JOIN public.brand_category bc ON bc.id = br.brand_category_id GROUP BY b.ymd, br.name, bc.name;",catalog,public
+"SELECT b.ymd, c.name, SUM(b.clicks) AS total_clicks FROM public.agg_monthly b JOIN public.city c ON b.city_id = c.id GROUP BY b.ymd, c.name;",catalog,public
+"SELECT brand_id, SUM(clicks) / SUM(impressions) AS click_through_rate FROM public.agg_hourly GROUP BY brand_id;",catalog,public
+"SELECT b.name, AVG(srt.clicks) AS avg_clicks FROM public.agg_hourly srt JOIN public.brand b ON srt.brand_id = b.id GROUP BY b.name;",catalog,public
+"SELECT b.ymd, br.name, AVG(b.clicks) AS avg_clicks FROM public.agg_daily b JOIN public.brand br ON b.brand_id = br.id GROUP BY b.ymd, br.name;",catalog,public
+"SELECT c.name, os.name, COUNT(*) AS count FROM public.agg_daily b JOIN public.city c ON b.city_id = c.id JOIN public.operating_system os ON b.os_id = os.id GROUP BY c.name, os.name;",catalog,public
+"SELECT b.ymd, MAX(b.views) AS max_views FROM public.agg_monthly b GROUP BY b.ymd ORDER BY max_views DESC;",catalog,public
+"SELECT brw.name, AVG(b.clicks) AS avg_clicks FROM public.agg_hourly b JOIN public.browser brw ON b.browser_id = brw.id GROUP BY brw.name;",catalog,public
+"SELECT b.ymd, br.name AS brand_name, SUM(b.spend) AS total_spend FROM public.agg_daily b JOIN public.brand br ON b.brand_id = br.id GROUP BY b.ymd, br.name ORDER BY b.ymd, br.name;",catalog,public
+"SELECT c.name AS city_name, SUM(b.conversions) AS total_conversions FROM public.agg_hourly b JOIN public.city c ON b.city_id = c.id GROUP BY c.name ORDER BY total_conversions DESC LIMIT 5;",catalog,public
+"SELECT br.name, SUM(b.impressions) AS total_impressions FROM public.agg_daily b JOIN public.browser br ON b.browser_id = br.id GROUP BY br.name;",catalog,public
+"SELECT ymd, COUNT(DISTINCT brand_id) AS unique_brands FROM public.agg_hourly GROUP BY ymd;",catalog,public
+"SELECT ymd, region_id, SUM(spend) AS total_spend, SUM(cost) AS total_cost FROM agg_monthly GROUP BY ymd, region_id;",catalog,public
+"SELECT ymd, SUM(impressions) AS total_impressions FROM public.agg_monthly GROUP BY ymd;",catalog,public
+"SELECT os.name, SUM(b.spend) AS total_spend FROM public.agg_daily b JOIN public.operating_system os ON b.os_id = os.id GROUP BY os.name;",catalog,public
+"SELECT brand_id, COUNT(*) AS count_conversions FROM public.agg_daily WHERE conversions > 0 GROUP BY brand_id;",catalog,public
+"SELECT b.ymd, COUNT(b.conversions) AS conversion_count FROM public.agg_hourly b GROUP BY b.ymd;",catalog,public
+"SELECT srt.ymd, b.name AS brand_name, SUM(srt.spend) AS total_spend FROM public.agg_monthly srt JOIN public.brand b ON srt.brand_id = b.id GROUP BY srt.ymd, b.name;",catalog,public
+"SELECT br.name, c.name, AVG(b.impressions) AS avg_impressions FROM public.agg_daily b JOIN public.brand br ON b.brand_id = br.id JOIN public.city c ON b.city_id = c.id GROUP BY br.name, c.name;",catalog,public
+"SELECT b.ymd, SUM(b.conversions) AS total_conversions, AVG(b.spend) AS avg_spend FROM public.agg_monthly b GROUP BY b.ymd;",catalog,public
+"SELECT ymd, SUM(spend) AS total_spend FROM public.agg_monthly GROUP BY ymd ORDER BY ymd DESC;",catalog,public
+"SELECT agg_daily.ymd, brand_category.name, SUM(agg_daily.conversions) * 1.0 / SUM(agg_daily.clicks) AS conversion_rate FROM agg_daily JOIN creative ON agg_daily.brand_id = creative.brand_id JOIN brand ON creative.brand_id = brand.id JOIN brand_category ON brand.brand_category_id = brand_category.id GROUP BY agg_daily.ymd, brand_category.name;",catalog,public
+"SELECT b.name, SUM(srt.conversions) AS total_conversions
+  FROM public.agg_daily srt
+  JOIN public.brand b ON srt.brand_id = b.id
+  WHERE srt.conversions > (SELECT AVG(conversions) FROM public.agg_daily)
+  GROUP BY b.name;",catalog,public
+"SELECT srt.ymd, reg.name as region_name, SUM(srt.clicks) / SUM(srt.impressions) AS click_through_rate FROM public.agg_daily srt JOIN public.region reg ON srt.region_id = reg.id GROUP BY srt.ymd, reg.name;",catalog,public
+"SELECT hour, SUM(impressions) AS total_impressions, SUM(clicks) AS total_clicks FROM agg_hourly WHERE ymd = '2024-03-03' GROUP BY hour;",catalog,public
+"SELECT ymd, city_id, region_id, brand_id, browser_id, os_id, sum(impressions) as impressions, sum(clicks) as clicks, sum(views) as views, sum(conversions) as conversions, sum(spend) as spend from public.agg_daily group by ymd, city_id, region_id, brand_id, browser_id, os_id",catalog,public
+"SELECT ymd, COUNT(DISTINCT brand_id) AS unique_brands FROM public.agg_monthly GROUP BY ymd;",catalog,public
+"SELECT region_id, AVG(spend) AS avg_spend, AVG(views) AS avg_views FROM public.agg_daily GROUP BY region_id;",catalog,public
+"SELECT ymd, city_id, region_id, brand_id, browser_id, os_id, sum(impressions) as impressions, sum(clicks) as clicks, sum(views) as views, sum(conversions) as conversions, sum(spend) as spend, sum(spend)/sum(conversions) as spend_per_conversion from public.agg_daily group by ymd, city_id, region_id, brand_id, browser_id, os_id",catalog,public
+"SELECT r.name AS region_name, AVG(srt.spend) AS avg_spend FROM public.agg_daily srt JOIN public.region r ON srt.region_id = r.id GROUP BY r.name;",catalog,public
+"SELECT ymd, SUM(spend) AS daily_spend FROM public.agg_monthly GROUP BY ymd ORDER BY ymd;",catalog,public
+"SELECT r.name AS region_name, SUM(b.impressions) AS total_impressions, SUM(b.spend) AS total_spend FROM public.agg_monthly b JOIN public.region r ON b.region_id = r.id GROUP BY r.name;",catalog,public
+"SELECT ymd, COUNT(DISTINCT brand_id) AS unique_brands FROM public.agg_daily GROUP BY ymd;",catalog,public
+"SELECT country_id, COUNT(ad_request_id) AS total_requests FROM ad_request GROUP BY country_id;",catalog,public
+"SELECT postal_code, COUNT(ad_request_id) AS request_count FROM ad_request WHERE region_id = '4' GROUP BY postal_code;",catalog,public
+"SELECT b.name AS browser_name, COUNT(click.ad_request_id) * 1.0 / COUNT(DISTINCT ar.ad_request_id) AS ctr FROM ad_request ar JOIN ad_click click ON ar.ad_request_id = click.ad_request_id JOIN browser b ON ar.browser_id = b.id GROUP BY b.name;",catalog,public
+"SELECT srt.ymd, r.name, SUM(srt.impressions) FROM public.agg_daily srt JOIN public.region r ON srt.region_id = r.id GROUP BY srt.ymd, r.name;",catalog,public
+"SELECT c.name AS city_name, SUM(b.spend) AS total_spend FROM public.agg_daily b JOIN public.city c ON b.city_id = c.id GROUP BY c.name;",catalog,public
+"SELECT br.name, c.name, AVG(b.impressions) AS avg_impressions FROM public.agg_daily b JOIN public.brand br ON b.brand_id = br.id JOIN public.city c ON b.city_id = c.id LEFT JOIN public.operating_system os on b.os_id = os.id GROUP BY br.name, c.name;",catalog,public
+"INSERT INTO public.ad_combined (datetime, publisher_id, browser_id, os_id, postal_code, city_id, region_id, country_id, creative_id, price, cost, click, view, conversion)
+        SELECT ar.datetime, ar.publisher_id, ar.browser_id, ar.os_id, ar.postal_code, ar.city_id, ar.country_id, aw.creative_id, aw.price, aw.cost,
+            case when ac.ad_request_id is not null then 1 else 0 end as click,
+            case when av.ad_request_id is not null then 1 else 0 end as view,
+            case when acv.ad_request_id is not null then 1 else 0 end as conversion
+        FROM public.ad_request ar
+        LEFT JOIN public.ad_win aw ON ar.ad_request_id = aw.ad_request_id
+        LEFT JOIN public.ad_click ac ON ar.ad_request_id = ac.ad_request_id
+        LEFT JOIN public.ad_view av ON ar.ad_request_id = av.ad_request_id
+        LEFT JOIN public.ad_conversion acv ON ar.ad_request_id = acv.ad_request_id
+        WHERE date(ar.datetime) = '2024-03-10' and hour(ar.datetime) = 9;",catalog,public
+"INSERT INTO public.agg_hourly (ymd, hour, publisher_id, browser_id, os_id, postal_code, city_id, region_id, country_id, creative_id, brand_id, spend, cost, impressions, clicks, views, conversions)
+        SELECT date(ac.datetime) as ymd, hour(ac.datetime) as hour, ac.publisher_id, ac.browser_id, ac.os_id, ac.postal_code, ac.city_id, ac.region_id, ac.country_id, ac.creative_id, c.brand_id, sum(ac.price), sum(ac.cost), count(1), sum(ac.click), sum(ac.view), sum(ac.conversion)
+        FROM public.ad_combined ac
+        LEFT JOIN public.creative c on ac.creative_id = c.id
+        WHERE date(ac.datetime) = '2024-03-10' and hour(ac.datetime) = 9
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11;",catalog,public
+"INSERT INTO public.agg_daily (ymd, publisher_id, browser_id, os_id, postal_code, city_id, region_id, country_id, creative_id, brand_id, impressions, clicks, views, conversions, spend, cost)
+        SELECT ymd, publisher_id, browser_id, os_id, postal_code, city_id, region_id, country_id, creative_id, brand_id, sum(impressions), sum(clicks), sum(views), sum(conversions), sum(spend), sum(cost)
+        FROM public.agg_hourly ah
+        WHERE ymd = '2024-03-10'
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;",catalog,public
+"INSERT INTO public.agg_monthly (ymd, publisher_id, browser_id, os_id, postal_code, city_id, region_id, country_id, creative_id, brand_id, impressions, clicks, views, conversions, spend, cost)
+  SELECT ymd, publisher_id, browser_id, os_id, postal_code, city_id, region_id, country_id, creative_id, brand_id, sum(impressions), sum(clicks), sum(views), sum(conversions), sum(spend), sum(cost)
+        FROM public.agg_daily ah
+        WHERE ymd = '{month}'
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;",catalog,public
+"INSERT INTO public.agg_monthly_v2 (ymd, publisher_id, browser_id, os_id, postal_code, city_id, region_id, country_id, creative_id, brand_id, impressions, clicks, views, conversions, spend, cost)
+  SELECT ymd, publisher_id, browser_id, os_id, postal_code, city_id, region_id, country_id, creative_id, brand_id, sum(impressions), sum(clicks), sum(views), sum(conversions), sum(spend), sum(cost)
+        FROM public.agg_daily ah
+        WHERE ymd = '{month}'
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;",catalog,public
