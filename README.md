@@ -5,6 +5,7 @@ A small script to help identify unused columns by analyzing the query history an
 ## Usage
 
 ```bash
+~ pip install -r requirements.txt # Install sqlglot library
 ~ python identify_unused_columns.py --query_file sample_queries.csv --info_schema_file sample_info_schema.csv
 Read 63 queries from sample_queries.csv
 Read 116 information schema rows from sample_info_schema.csv
