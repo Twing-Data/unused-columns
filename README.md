@@ -86,3 +86,51 @@ select table_catalog, table_schema, table_name, column_name
 from information_schema.columns
 where table_schema != 'INFORMATION_SCHEMA'
 ```
+
+## Snowflake Enterprise query
+
+If you have Snowflake Enterprise, you can use the following query to get the unused columns.
+
+```sql
+with
+access_history as (
+    select *
+    from snowflake.account_usage.access_history
+    where query_start_time > current_date - interval '1 month'
+),
+access_history_flattened as (
+    select
+        access_history.query_id,
+        access_history.query_start_time,
+        access_history.user_name,
+        objects_accessed.value:objectId::integer as table_id,
+        objects_accessed.value:objectName::text as object_name,
+        cols.value as cols,
+        cols.value:columnName as column_name,
+        cols.value:columnId as column_id
+    from access_history,
+        lateral flatten(access_history.base_objects_accessed) as objects_accessed,
+        lateral flatten(input => objects_accessed.value:columns) as cols
+    where objects_accessed.value:objectDomain::text = 'Table'
+    and objects_accessed.value:objectId::integer is not null
+),
+column_access_history as (
+	select
+      ahf.query_id,
+      ahf.query_start_time,
+      ahf.user_name,
+      ahf.column_id,
+      cols.column_name,
+      cols.table_name,
+      cols.table_schema,
+      cols.table_catalog
+	from access_history_flattened ahf
+    join snowflake.account_usage.columns cols on ahf.column_id = cols.column_id
+)
+select all_cols.table_catalog, all_cols.table_schema, all_cols.table_name, all_cols.column_name
+from snowflake.account_usage.columns all_cols
+left join column_access_history cah on all_cols.column_id = cah.column_id
+where all_cols.table_schema not in ('INFORMATION_SCHEMA')
+and cah.column_id is null
+group by all;
+```
